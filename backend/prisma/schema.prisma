@@ -1,0 +1,138 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id           String          @id @default(uuid())
+  name         String
+  email        String          @unique
+  phone        String
+  passwordHash String
+  role         String          @default("CITIZEN") // CITIZEN, FIELD_WORKER, AUTHORITY, ADMIN
+  isActive     Boolean         @default(true)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  reports        PotholeReport[] @relation("CitizenReports")
+  assignedJobs   PotholeReport[] @relation("WorkerAssignments")
+  repairUpdates  RepairUpdate[]
+  comments       Comment[]
+  notifications  Notification[]
+  auditLogs      AuditLog[]
+
+  @@index([role])
+  @@index([email])
+}
+
+model PotholeReport {
+  id                  String             @id @default(uuid())
+  reporterId          String
+  reporter            User               @relation("CitizenReports", fields: [reporterId], references: [id], onDelete: Cascade)
+  title               String
+  description         String             @db.Text
+  latitude            Float
+  longitude           Float
+  address             String
+  imageUrl            String             @db.Text
+  
+  severity            String             @default("LOW") // LOW, MEDIUM, HIGH, CRITICAL
+  severityScore       Int                @default(0)
+  priority            String             @default("LOW") // LOW, MEDIUM, HIGH, CRITICAL
+  priorityScore       Int                @default(0)
+  
+  // Storing original AI assessment vs human authority override
+  aiSeverity          String             @default("LOW")
+  aiPriority          String             @default("LOW")
+  aiPriorityScore     Int                @default(0)
+  confidenceScore     Float              @default(0.85)
+  aiReason            String?            @db.Text
+  isFallbackAnalysis  Boolean            @default(false)
+  priorityExplanation String?            @db.Text
+  
+  authorityPriority   String?
+  authorityReason     String?            @db.Text
+
+  status              String             @default("SUBMITTED") // SUBMITTED, UNDER_REVIEW, VERIFIED, ASSIGNED, IN_PROGRESS, REPAIRED, CLOSED, REJECTED
+  verificationStatus  String             @default("PENDING") // PENDING, VERIFIED, REJECTED
+  
+  assignedWorkerId    String?
+  assignedWorker      User?              @relation("WorkerAssignments", fields: [assignedWorkerId], references: [id], onDelete: SetNull)
+
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+  verifiedAt          DateTime?
+  completedAt         DateTime?
+
+  repairUpdates       RepairUpdate[]
+  comments            Comment[]
+
+  @@index([status])
+  @@index([priority])
+  @@index([severity])
+  @@index([reporterId])
+  @@index([assignedWorkerId])
+  @@index([createdAt])
+  @@index([latitude, longitude])
+}
+
+model RepairUpdate {
+  id             String        @id @default(uuid())
+  reportId       String
+  report         PotholeReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  workerId       String
+  worker         User          @relation(fields: [workerId], references: [id], onDelete: Cascade)
+  status         String
+  notes          String        @db.Text
+  beforeImageUrl String?       @db.Text
+  afterImageUrl  String?       @db.Text
+  createdAt      DateTime      @default(now())
+
+  @@index([reportId])
+  @@index([workerId])
+}
+
+model Comment {
+  id        String        @id @default(uuid())
+  reportId  String
+  report    PotholeReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  message   String        @db.Text
+  createdAt DateTime      @default(now())
+
+  @@index([reportId])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  message   String   @db.Text
+  type      String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([isRead])
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action     String
+  entityType String
+  entityId   String
+  metadata   String?  @db.Text // JSON stringified payload
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([entityType, entityId])
+  @@index([createdAt])
+}

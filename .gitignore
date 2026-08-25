@@ -1,0 +1,73 @@
+# ==============================
+# Dependencies
+# ==============================
+node_modules/
+**/node_modules/
+
+# ==============================
+# Environment variables / secrets
+# ==============================
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# ==============================
+# Build output
+# ==============================
+dist/
+**/dist/
+build/
+**/build/
+
+# ==============================
+# Local uploads / generated files
+# ==============================
+uploads/
+**/uploads/
+
+# ==============================
+# Local development databases
+# ==============================
+backend/prisma/dev.db
+backend/prisma/*.db
+backend/prisma/*.db-journal
+
+# ==============================
+# Logs
+# ==============================
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# ==============================
+# Test / coverage output
+# ==============================
+coverage/
+.nyc_output/
+
+# ==============================
+# IDE / editor files
+# ==============================
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ==============================
+# Operating system files
+# ==============================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ==============================
+# Temporary files
+# ==============================
+*.tmp
+*.temp
+*.bak
+
+*.timestamp-*.mjs
