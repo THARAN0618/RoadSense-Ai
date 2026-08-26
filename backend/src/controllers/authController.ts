@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction, CookieOptions } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { z } from 'zod';
@@ -7,6 +7,19 @@ import { createAuditLog } from '../services/auditService';
 import { getJwtSecret } from '../config/jwt';
 
 const IS_PROD = process.env.NODE_ENV === 'production';
+
+const getCookieOptions = (): CookieOptions => ({
+  httpOnly: true,
+  secure: IS_PROD,
+  sameSite: IS_PROD ? 'none' : 'lax',
+  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+});
+
+const getClearCookieOptions = (): CookieOptions => ({
+  httpOnly: true,
+  secure: IS_PROD,
+  sameSite: IS_PROD ? 'none' : 'lax',
+});
 
 const registerSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -65,12 +78,7 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
     );
 
     // Set secure HTTP-only cookie
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: IS_PROD,
-      sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    });
+    res.cookie('token', token, getCookieOptions());
 
     await createAuditLog(user.id, 'USER_REGISTERED', 'User', user.id, { email: user.email, role: user.role });
 
@@ -110,12 +118,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       { expiresIn: '7d' }
     );
 
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: IS_PROD,
-      sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    res.cookie('token', token, getCookieOptions());
 
     await createAuditLog(user.id, 'USER_LOGIN', 'User', user.id, { email: user.email, role: user.role });
 
@@ -140,7 +143,7 @@ export const logout = async (req: Request, res: Response, next: NextFunction) =>
     if (req.user) {
       await createAuditLog(req.user.id, 'USER_LOGOUT', 'User', req.user.id);
     }
-    res.clearCookie('token');
+    res.clearCookie('token', getClearCookieOptions());
     return res.status(200).json({ message: 'Logged out successfully' });
   } catch (error) {
     next(error);
