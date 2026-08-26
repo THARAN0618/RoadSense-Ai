@@ -17,8 +17,9 @@ export const errorHandler = (
   }
 
   if (err.name === 'ZodError') {
+    const firstErrorMessage = err.errors?.[0]?.message || 'Validation failed';
     return res.status(400).json({
-      error: 'Validation failed',
+      error: firstErrorMessage,
       details: err.errors?.map((e: any) => ({ path: e.path.join('.'), message: e.message })),
     });
   }

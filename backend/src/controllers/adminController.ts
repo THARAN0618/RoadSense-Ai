@@ -85,8 +85,12 @@ export const updateUserStatus = async (req: Request, res: Response, next: NextFu
 
     const dataToUpdate: any = {};
     if (typeof isActive === 'boolean') dataToUpdate.isActive = isActive;
-    if (role && ['CITIZEN', 'FIELD_WORKER', 'AUTHORITY', 'ADMIN'].includes(role)) {
-      dataToUpdate.role = role;
+    if (role !== undefined) {
+      if (['CITIZEN', 'FIELD_WORKER', 'AUTHORITY', 'ADMIN'].includes(role)) {
+        dataToUpdate.role = role;
+      } else {
+        return res.status(400).json({ error: 'Invalid role. Must be CITIZEN, FIELD_WORKER, AUTHORITY, or ADMIN.' });
+      }
     }
 
     const updatedUser = await prisma.user.update({
@@ -105,8 +109,8 @@ export const updateUserStatus = async (req: Request, res: Response, next: NextFu
 
 export const getAuditLogs = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    if (!req.user || !['ADMIN', 'AUTHORITY'].includes(req.user.role)) {
-      return res.status(403).json({ error: 'Access restricted to administrators and authorities.' });
+    if (!req.user || req.user.role !== 'ADMIN') {
+      return res.status(403).json({ error: 'Access restricted to administrators.' });
     }
 
     const { entityType, action, page = '1', limit = '50' } = req.query;
@@ -147,8 +151,8 @@ export const getAuditLogs = async (req: Request, res: Response, next: NextFuncti
 
 export const getAnalytics = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    if (!req.user || !['ADMIN', 'AUTHORITY'].includes(req.user.role)) {
-      return res.status(403).json({ error: 'Access restricted to administrators and authorities.' });
+    if (!req.user || req.user.role !== 'ADMIN') {
+      return res.status(403).json({ error: 'Access restricted to administrators.' });
     }
 
     const [

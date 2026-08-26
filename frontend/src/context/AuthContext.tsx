@@ -9,17 +9,9 @@ interface AuthContextType {
   register: (data: any) => Promise<void>;
   logout: () => Promise<void>;
   refetchUser: () => Promise<void>;
-  switchDemoRole: (role: Role) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-const DEMO_ACCOUNTS: Record<Role, string> = {
-  ADMIN: 'admin@roadsense.demo',
-  AUTHORITY: 'authority@roadsense.demo',
-  FIELD_WORKER: 'worker@roadsense.demo',
-  CITIZEN: 'citizen@roadsense.demo',
-};
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -52,14 +44,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const logout = async () => {
-    await logoutApi();
-    setUser(null);
-  };
-
-  const switchDemoRole = async (role: Role) => {
-    const email = DEMO_ACCOUNTS[role];
-    if (email) {
-      await login(email, 'Password123!');
+    try {
+      await logoutApi();
+    } catch (err) {
+      console.error('Logout error:', err);
+    } finally {
+      setUser(null);
+      localStorage.clear();
+      sessionStorage.clear();
     }
   };
 
@@ -72,7 +64,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         register,
         logout,
         refetchUser: fetchCurrentUser,
-        switchDemoRole,
       }}
     >
       {children}

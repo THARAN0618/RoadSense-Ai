@@ -10,6 +10,7 @@
     "prisma:generate": "prisma generate",
     "prisma:db:push": "prisma db push",
     "db:seed": "ts-node prisma/seed.ts",
+    "bootstrap:admin": "ts-node scripts/bootstrap-admin.ts",
     "test": "jest --runInBand --detectOpenHandles --forceExit"
   },
   "dependencies": {

@@ -11,9 +11,9 @@ const IS_PROD = process.env.NODE_ENV === 'production';
 const registerSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Invalid email address'),
-  phone: z.string().min(7, 'Invalid phone number'),
+  phone: z.string().optional().default(''),
   password: z.string().min(6, 'Password must be at least 6 characters'),
-  confirmPassword: z.string(),
+  confirmPassword: z.string().min(1, 'Please confirm your password'),
 }).refine(data => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ['confirmPassword'],

@@ -8,7 +8,7 @@ interface LoginPageProps {
 }
 
 export const LoginPage: React.FC<LoginPageProps> = ({ onSwitchToRegister }) => {
-  const { login, switchDemoRole } = useAuth();
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -27,18 +27,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSwitchToRegister }) => {
     }
   };
 
-  const handleDemoLogin = async (role: Role) => {
-    try {
-      setLoading(true);
-      setError(null);
-      await switchDemoRole(role);
-    } catch (err: any) {
-      setError(err?.response?.data?.error || 'Demo login failed');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <div className="min-h-screen bg-slate-950 flex flex-col justify-center items-center p-4 relative overflow-hidden">
       {/* Background glow effects */}
@@ -46,7 +34,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSwitchToRegister }) => {
       <div className="absolute bottom-10 right-10 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
 
       <div className="w-full max-w-4xl grid grid-cols-1 lg:grid-cols-2 gap-8 items-center z-10">
-        {/* Left Side: Brand Context & Quick Demo Accounts */}
+        {/* Left Side: Brand Context */}
         <div className="space-y-6 text-left">
           <div className="flex items-center space-x-3">
             <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-sky-500 to-emerald-400 p-0.5 shadow-xl shadow-sky-500/20">
@@ -65,63 +53,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSwitchToRegister }) => {
           <p className="text-sm text-slate-400 leading-relaxed">
             AI-driven pothole prioritization and civic road maintenance system with explainable scoring, real-time authority dispatch, and field evidence tracking.
           </p>
-
-          {/* Quick Demo Role Cards */}
-          <div className="space-y-2 pt-2">
-            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
-              1-Click Demo Quick Switch:
-            </span>
-
-            <div className="grid grid-cols-2 gap-2.5">
-              <button
-                type="button"
-                onClick={() => handleDemoLogin('CITIZEN')}
-                className="bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-sky-500/40 p-3 rounded-xl text-left transition-all group"
-              >
-                <div className="flex items-center space-x-2 text-sky-400 font-bold text-xs">
-                  <Users className="w-4 h-4" />
-                  <span>Citizen</span>
-                </div>
-                <div className="text-[10px] text-slate-500 mt-1">Report & Track Potholes</div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleDemoLogin('FIELD_WORKER')}
-                className="bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-emerald-500/40 p-3 rounded-xl text-left transition-all group"
-              >
-                <div className="flex items-center space-x-2 text-emerald-400 font-bold text-xs">
-                  <Wrench className="w-4 h-4" />
-                  <span>Field Worker</span>
-                </div>
-                <div className="text-[10px] text-slate-500 mt-1">Repair Jobs & Evidence</div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleDemoLogin('AUTHORITY')}
-                className="bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-amber-500/40 p-3 rounded-xl text-left transition-all group"
-              >
-                <div className="flex items-center space-x-2 text-amber-400 font-bold text-xs">
-                  <ShieldCheck className="w-4 h-4" />
-                  <span>Authority</span>
-                </div>
-                <div className="text-[10px] text-slate-500 mt-1">Verify, Assign & Override</div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleDemoLogin('ADMIN')}
-                className="bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-purple-500/40 p-3 rounded-xl text-left transition-all group"
-              >
-                <div className="flex items-center space-x-2 text-purple-400 font-bold text-xs">
-                  <UserCheck className="w-4 h-4" />
-                  <span>Admin</span>
-                </div>
-                <div className="text-[10px] text-slate-500 mt-1">Analytics & Audit Logs</div>
-              </button>
-            </div>
-          </div>
         </div>
 
         {/* Right Side: Login Form */}

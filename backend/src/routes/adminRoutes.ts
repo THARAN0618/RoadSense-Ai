@@ -5,10 +5,10 @@ import { requireAuth, requireRole } from '../middleware/auth';
 const router = Router();
 
 router.use(requireAuth);
-router.use(requireRole('ADMIN', 'AUTHORITY'));
+router.use(requireRole('ADMIN'));
 
-router.get('/users', requireRole('ADMIN'), getUsers);
-router.patch('/users/:id', requireRole('ADMIN'), updateUserStatus);
+router.get('/users', getUsers);
+router.patch('/users/:id', updateUserStatus);
 router.get('/audit-logs', getAuditLogs);
 router.get('/analytics', getAnalytics);
 

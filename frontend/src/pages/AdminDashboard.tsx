@@ -30,6 +30,8 @@ import {
   RefreshCw,
 } from 'lucide-react';
 
+import { useLocation, useNavigate } from 'react-router-dom';
+
 const SEVERITY_COLORS: Record<string, string> = {
   CRITICAL: '#ef4444',
   HIGH: '#f97316',
@@ -38,8 +40,17 @@ const SEVERITY_COLORS: Record<string, string> = {
 };
 
 export const AdminDashboard: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'analytics' | 'users' | 'audit'>('analytics');
-  
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const getActiveTabFromPath = (): 'analytics' | 'users' | 'audit' => {
+    if (location.pathname === '/admin/users') return 'users';
+    if (location.pathname === '/admin/audit') return 'audit';
+    return 'analytics';
+  };
+
+  const activeTab = getActiveTabFromPath();
+
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [users, setUsers] = useState<User[]>([]);
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
@@ -120,7 +131,7 @@ export const AdminDashboard: React.FC = () => {
       {/* Tabs */}
       <div className="flex items-center space-x-2 border-b border-slate-800 pb-2">
         <button
-          onClick={() => setActiveTab('analytics')}
+          onClick={() => navigate('/admin/analytics')}
           className={`px-4 py-2 rounded-xl text-xs font-semibold flex items-center space-x-2 transition-colors ${
             activeTab === 'analytics'
               ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
@@ -132,7 +143,7 @@ export const AdminDashboard: React.FC = () => {
         </button>
 
         <button
-          onClick={() => setActiveTab('users')}
+          onClick={() => navigate('/admin/users')}
           className={`px-4 py-2 rounded-xl text-xs font-semibold flex items-center space-x-2 transition-colors ${
             activeTab === 'users'
               ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
@@ -144,7 +155,7 @@ export const AdminDashboard: React.FC = () => {
         </button>
 
         <button
-          onClick={() => setActiveTab('audit')}
+          onClick={() => navigate('/admin/audit')}
           className={`px-4 py-2 rounded-xl text-xs font-semibold flex items-center space-x-2 transition-colors ${
             activeTab === 'audit'
               ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'

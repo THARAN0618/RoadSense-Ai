@@ -1,9 +1,9 @@
 import React from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
   LayoutDashboard,
   MapPin,
-  CheckSquare,
   Wrench,
   Users,
   ShieldCheck,
@@ -13,44 +13,42 @@ import {
 } from 'lucide-react';
 
 interface SidebarProps {
-  activeTab: string;
-  setActiveTab: (tab: string) => void;
   onOpenReportModal?: () => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onOpenReportModal }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ onOpenReportModal }) => {
   const { user } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
   const role = user?.role;
 
   const getNavItems = () => {
     switch (role) {
       case 'CITIZEN':
         return [
-          { id: 'dashboard', label: 'My Dashboard', icon: LayoutDashboard },
-          { id: 'map', label: 'Interactive Map', icon: MapPin },
+          { id: 'dashboard', label: 'My Dashboard', icon: LayoutDashboard, path: '/dashboard' },
+          { id: 'map', label: 'Interactive Map', icon: MapPin, path: '/map' },
         ];
       case 'FIELD_WORKER':
         return [
-          { id: 'jobs', label: 'Assigned Jobs', icon: Wrench },
-          { id: 'map', label: 'Repair Map', icon: MapPin },
+          { id: 'jobs', label: 'Assigned Jobs', icon: Wrench, path: '/jobs' },
+          { id: 'map', label: 'Repair Map', icon: MapPin, path: '/map' },
         ];
       case 'AUTHORITY':
         return [
-          { id: 'authority', label: 'Authority Portal', icon: ShieldCheck },
-          { id: 'analytics', label: 'Analytics Dashboard', icon: BarChart3 },
-          { id: 'map', label: 'Geospatial Map', icon: MapPin },
-          { id: 'audit', label: 'Audit Logs', icon: FileText },
+          { id: 'authority', label: 'Authority Portal', icon: ShieldCheck, path: '/authority' },
+          { id: 'map', label: 'Geospatial Map', icon: MapPin, path: '/map' },
         ];
       case 'ADMIN':
         return [
-          { id: 'admin-overview', label: 'System Overview', icon: LayoutDashboard },
-          { id: 'users', label: 'User Management', icon: Users },
-          { id: 'analytics', label: 'Analytics', icon: BarChart3 },
-          { id: 'map', label: 'Map View', icon: MapPin },
-          { id: 'audit', label: 'Audit Log Inspector', icon: FileText },
+          { id: 'admin-overview', label: 'System Overview', icon: LayoutDashboard, path: '/admin' },
+          { id: 'users', label: 'User Management', icon: Users, path: '/admin/users' },
+          { id: 'analytics', label: 'Analytics', icon: BarChart3, path: '/admin/analytics' },
+          { id: 'audit', label: 'Audit Log Inspector', icon: FileText, path: '/admin/audit' },
+          { id: 'map', label: 'Map View', icon: MapPin, path: '/map' },
         ];
       default:
-        return [{ id: 'map', label: 'Map View', icon: MapPin }];
+        return [{ id: 'map', label: 'Map View', icon: MapPin, path: '/map' }];
     }
   };
 
@@ -62,7 +60,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onOpe
         {/* User Role Card */}
         <div className="bg-slate-950/60 border border-slate-800 rounded-xl p-3 flex items-center space-x-3">
           <div className="w-9 h-9 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 font-bold">
-            {user?.name.charAt(0)}
+            {user?.name ? user.name.charAt(0) : 'U'}
           </div>
           <div className="overflow-hidden">
             <div className="text-xs font-semibold text-white truncate">{user?.name}</div>
@@ -90,11 +88,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onOpe
           </div>
           {navItems.map((item) => {
             const Icon = item.icon;
-            const isActive = activeTab === item.id;
+            const isActive = location.pathname === item.path;
             return (
               <button
                 key={item.id}
-                onClick={() => setActiveTab(item.id)}
+                onClick={() => navigate(item.path)}
                 className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all ${
                   isActive
                     ? 'bg-sky-500/15 text-sky-400 border border-sky-500/30 shadow-sm'
@@ -119,3 +117,4 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onOpe
     </aside>
   );
 };
+

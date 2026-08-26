@@ -13,16 +13,20 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onSwitchToLogin }) =
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState<Role>('CITIZEN');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (password !== confirmPassword) {
+      setError("Passwords don't match");
+      return;
+    }
     try {
       setLoading(true);
       setError(null);
-      await register({ name, email, phone, password, role });
+      await register({ name, email, phone, password, confirmPassword });
     } catch (err: any) {
       setError(err?.response?.data?.error || 'Registration failed');
     } finally {
@@ -95,22 +99,21 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onSwitchToLogin }) =
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Min 8 characters with number & symbol"
+              placeholder="Min 6 characters"
               className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">Account Role</label>
-            <select
-              value={role}
-              onChange={(e) => setRole(e.target.value as Role)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-sky-500"
-            >
-              <option value="CITIZEN">CITIZEN (Report & track potholes)</option>
-              <option value="FIELD_WORKER">FIELD WORKER (Execute repairs)</option>
-              <option value="AUTHORITY">AUTHORITY (Inspect, prioritize & dispatch)</option>
-            </select>
+            <label className="block text-xs font-semibold text-slate-300 mb-1">Confirm Password *</label>
+            <input
+              type="password"
+              required
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="Re-enter password"
+              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500"
+            />
           </div>
 
           <button

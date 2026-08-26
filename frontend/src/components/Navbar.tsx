@@ -23,11 +23,10 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ onOpenReportModal }) => {
-  const { user, logout, switchDemoRole } = useAuth();
+  const { user, logout } = useAuth();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState<number>(0);
   const [showNotifications, setShowNotifications] = useState<boolean>(false);
-  const [showRoleDropdown, setShowRoleDropdown] = useState<boolean>(false);
 
   const fetchNotifications = async () => {
     if (!user) return;
@@ -115,42 +114,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenReportModal }) => {
             </button>
           )}
 
-          {/* Quick Demo Role Switcher Dropdown */}
-          <div className="relative">
-            <button
-              onClick={() => setShowRoleDropdown(!showRoleDropdown)}
-              className="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-700 flex items-center space-x-1.5 transition-colors"
-              title="Quickly switch demo user roles"
-            >
-              <Layers className="w-3.5 h-3.5 text-sky-400" />
-              <span className="hidden md:inline">Demo Switch:</span>
-              <span className="font-semibold text-white">{user?.role}</span>
-              <ChevronDown className="w-3 h-3 text-slate-400" />
-            </button>
 
-            {showRoleDropdown && (
-              <div className="absolute right-0 mt-2 w-52 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl py-2 z-50 animate-in fade-in slide-in-from-top-2">
-                <div className="px-3 py-1.5 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                  Switch Demo Account
-                </div>
-                {(['CITIZEN', 'FIELD_WORKER', 'AUTHORITY', 'ADMIN'] as Role[]).map((r) => (
-                  <button
-                    key={r}
-                    onClick={() => {
-                      switchDemoRole(r);
-                      setShowRoleDropdown(false);
-                    }}
-                    className={`w-full text-left px-3 py-2 text-xs font-medium flex items-center justify-between hover:bg-slate-800 transition-colors ${
-                      user?.role === r ? 'text-sky-400 bg-sky-500/10' : 'text-slate-300'
-                    }`}
-                  >
-                    <span>{r.replace('_', ' ')}</span>
-                    {user?.role === r && <CheckCircle className="w-3.5 h-3.5 text-sky-400" />}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
 
           {/* Notifications Bell */}
           <div className="relative">
